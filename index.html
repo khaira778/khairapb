@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Data Kasir</title>
+
+    <!-- Library Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f7eee7;
+            color: #4b3930;
+        }
+
+        .container {
+            width: 1100px;
+            max-width: 95%;
+            margin: 40px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.10);
+        }
+
+        h1 {
+            text-align: center;
+            color: #9b5d43;
+            margin-bottom: 5px;
+        }
+
+        .subjudul {
+            text-align: center;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+
+        /* =========================
+           TOMBOL EXCEL DI ATAS
+           ========================= */
+
+        .top-button {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .btn-export {
+            padding: 9px 15px;
+            border: none;
+            border-radius: 8px;
+            background: #217346;
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-export:hover {
+            background: #185c37;
+        }
+
+
+        /* =========================
+           DATA PELANGGAN
+           ========================= */
+
+        .data-pelanggan {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 9px;
+            font-size: 15px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #9b5d43;
+        }
+
+
+        /* =========================
+           FORM BARANG
+           ========================= */
+
+        .form-barang {
+            display: grid;
+            grid-template-columns: 1fr 130px 180px 160px;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .btn-tambah {
+            padding: 12px;
+            border: none;
+            border-radius: 9px;
+            background: #9b5d43;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-tambah:hover {
+            background: #7e4935;
+        }
+
+
+        /* =========================
+           TABEL
+           ========================= */
+
+        .tabel-box {
+            margin-top: 30px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #9b5d43;
+            color: white;
+            padding: 12px;
+        }
+
+        td {
+            padding: 11px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+
+        tr:hover {
+            background: #faf5f1;
+        }
+
+        .kosong {
+            text-align: center;
+            color: #999;
+            padding: 25px;
+        }
+
+
+        /* =========================
+           TOTAL
+           ========================= */
+
+        .total-box {
+            margin-top: 20px;
+            padding: 18px;
+            background: #f3e1d4;
+            border-radius: 12px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-box span:first-child {
+            font-weight: bold;
+        }
+
+        #totalSemua {
+            color: #9b5d43;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+
+        /* =========================
+           TOMBOL AKSI
+           ========================= */
+
+        .aksi {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-edit {
+            border: none;
+            background: #e0a12b;
+            color: white;
+            padding: 7px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-edit:hover {
+            background: #c88a17;
+        }
+
+        .btn-hapus {
+            border: none;
+            background: #d9534f;
+            color: white;
+            padding: 7px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-hapus:hover {
+            background: #b52b27;
+        }
+
+
+        /* =========================
+           HAPUS SEMUA
+           ========================= */
+
+        .button-area {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .btn-reset {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            background: #ddd;
+            color: #444;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-reset:hover {
+            background: #ccc;
+        }
+
+
+        /* =========================
+           RESPONSIVE
+           ========================= */
+
+        @media(max-width: 800px) {
+
+            .data-pelanggan {
+                grid-template-columns: 1fr;
+            }
+
+            .form-barang {
+                grid-template-columns: 1fr;
+            }
+
+            .top-button {
+                justify-content: center;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>🧾 Data Kasir</h1>
+
+        <div class="subjudul">
+            Pendataan Transaksi Banyak Pelanggan
+        </div>
+
+
+        <!-- =========================
+             TOMBOL EXPORT EXCEL
+             ========================= -->
+
+        <div class="top-button">
+
+            <button
+                class="btn-export"
+                onclick="exportExcel()"
+            >
+                📊 Export Excel
+            </button>
+
+        </div>
+
+
+        <!-- =========================
+             DATA PELANGGAN
+             ========================= -->
+
+        <div class="data-pelanggan">
+
+            <div>
+
+                <label>Nama Pelanggan</label>
+
+                <input
+                    type="text"
+                    id="namaPelanggan"
+                    placeholder="Contoh: Khaira"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>Tanggal Transaksi</label>
+
+                <input
+                    type="date"
+                    id="tanggal"
+                >
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             DATA BARANG
+             ========================= -->
+
+        <div class="form-barang">
+
+            <div>
+
+                <label>Nama Barang</label>
+
+                <input
+                    type="text"
+                    id="namaBarang"
+                    placeholder="Contoh: Indomie"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>Jumlah</label>
+
+                <input
+                    type="number"
+                    id="jumlah"
+                    min="1"
+                    placeholder="2"
+                >
+
+            </div>
+
+
+            <div>
+
+                <label>Harga Satuan</label>
+
+                <input
+                    type="number"
+                    id="harga"
+                    min="0"
+                    placeholder="3500"
+                >
+
+            </div>
+
+
+            <button
+                class="btn-tambah"
+                id="btnTambah"
+                onclick="tambahData()"
+            >
+                + Tambah Data
+            </button>
+
+        </div>
+
+
+        <!-- =========================
+             TABEL
+             ========================= -->
+
+        <div class="tabel-box">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>No</th>
+                        <th>Nama Pelanggan</th>
+                        <th>Tanggal</th>
+                        <th>Nama Barang</th>
+                        <th>Jumlah</th>
+                        <th>Harga Satuan</th>
+                        <th>Total</th>
+                        <th>Aksi</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="tabelData">
+
+                    <tr>
+
+                        <td
+                            colspan="8"
+                            class="kosong"
+                        >
+                            Belum ada data
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- =========================
+             TOTAL
+             ========================= -->
+
+        <div class="total-box">
+
+            <span>
+                TOTAL SEMUA TRANSAKSI
+            </span>
+
+            <span id="totalSemua">
+                Rp 0
+            </span>
+
+        </div>
+
+
+        <!-- =========================
+             HAPUS SEMUA
+             ========================= -->
+
+        <div class="button-area">
+
+            <button
+                class="btn-reset"
+                onclick="resetData()"
+            >
+                🗑️ Hapus Semua
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /* =========================
+       ARRAY DATA
+       ========================= */
+
+    let transaksi = [];
+
+    /* Menyimpan index yang sedang diedit */
+    let indexEdit = -1;
+
+
+    /* =========================
+       TANGGAL OTOMATIS
+       ========================= */
+
+    window.onload = function() {
+
+        let hariIni = new Date();
+
+        let tahun =
+            hariIni.getFullYear();
+
+        let bulan =
+            String(
+                hariIni.getMonth() + 1
+            ).padStart(2, "0");
+
+        let hari =
+            String(
+                hariIni.getDate()
+            ).padStart(2, "0");
+
+        document.getElementById("tanggal").value =
+            tahun + "-" + bulan + "-" + hari;
+
+    };
+
+
+    /* =========================
+       TAMBAH / SIMPAN EDIT
+       ========================= */
+
+    function tambahData() {
+
+        let pelanggan =
+            document.getElementById(
+                "namaPelanggan"
+            ).value.trim();
+
+
+        let tanggal =
+            document.getElementById(
+                "tanggal"
+            ).value;
+
+
+        let nama =
+            document.getElementById(
+                "namaBarang"
+            ).value.trim();
+
+
+        let jumlah =
+            Number(
+                document.getElementById(
+                    "jumlah"
+                ).value
+            );
+
+
+        let harga =
+            Number(
+                document.getElementById(
+                    "harga"
+                ).value
+            );
+
+
+        /* CEK DATA */
+
+        if (
+            pelanggan === "" ||
+            tanggal === "" ||
+            nama === "" ||
+            jumlah <= 0 ||
+            harga < 0
+        ) {
+
+            alert(
+                "Silakan isi semua data terlebih dahulu!"
+            );
+
+            return;
+
+        }
+
+
+        let total =
+            jumlah * harga;
+
+
+        /* =========================
+           JIKA SEDANG EDIT
+           ========================= */
+
+        if (indexEdit !== -1) {
+
+            transaksi[indexEdit] = {
+
+                pelanggan: pelanggan,
+
+                tanggal: tanggal,
+
+                nama: nama,
+
+                jumlah: jumlah,
+
+                harga: harga,
+
+                total: total
+
+            };
+
+
+            indexEdit = -1;
+
+
+            document.getElementById(
+                "btnTambah"
+            ).innerText =
+                "+ Tambah Data";
+
+
+            tampilkanData();
+
+
+            kosongkanForm();
+
+
+            return;
+
+        }
+
+
+        /* =========================
+           DATA BARU
+           ========================= */
+
+        transaksi.push({
+
+            pelanggan: pelanggan,
+
+            tanggal: tanggal,
+
+            nama: nama,
+
+            jumlah: jumlah,
+
+            harga: harga,
+
+            total: total
+
+        });
+
+
+        tampilkanData();
+
+
+        kosongkanBarang();
+
+    }
+
+
+    /* =========================
+       EDIT DATA
+       ========================= */
+
+    function editData(index) {
+
+        let data =
+            transaksi[index];
+
+
+        document.getElementById(
+            "namaPelanggan"
+        ).value =
+            data.pelanggan;
+
+
+        document.getElementById(
+            "tanggal"
+        ).value =
+            data.tanggal;
+
+
+        document.getElementById(
+            "namaBarang"
+        ).value =
+            data.nama;
+
+
+        document.getElementById(
+            "jumlah"
+        ).value =
+            data.jumlah;
+
+
+        document.getElementById(
+            "harga"
+        ).value =
+            data.harga;
+
+
+        /* Simpan index yang diedit */
+
+        indexEdit = index;
+
+
+        /* Ubah tulisan tombol */
+
+        document.getElementById(
+            "btnTambah"
+        ).innerText =
+            "💾 Simpan Perubahan";
+
+
+        /* Scroll ke form */
+
+        window.scrollTo({
+
+            top: 250,
+
+            behavior: "smooth"
+
+        });
+
+    }
+
+
+    /* =========================
+       TAMPILKAN DATA
+       ========================= */
+
+    function tampilkanData() {
+
+        let tabel =
+            document.getElementById(
+                "tabelData"
+            );
+
+
+        tabel.innerHTML = "";
+
+
+        let totalSemua = 0;
+
+
+        if (transaksi.length === 0) {
+
+            tabel.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="8"
+                        class="kosong"
+                    >
+                        Belum ada data
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+
+
+        transaksi.forEach(
+            function(data, index) {
+
+                totalSemua +=
+                    data.total;
+
+
+                let baris =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                baris.innerHTML = `
+
+                    <td>
+                        ${index + 1}
+                    </td>
+
+                    <td>
+                        ${data.pelanggan}
+                    </td>
+
+                    <td>
+                        ${formatTanggal(data.tanggal)}
+                    </td>
+
+                    <td>
+                        ${data.nama}
+                    </td>
+
+                    <td>
+                        ${data.jumlah}
+                    </td>
+
+                    <td>
+                        ${formatRupiah(data.harga)}
+                    </td>
+
+                    <td>
+                        ${formatRupiah(data.total)}
+                    </td>
+
+                    <td>
+
+                        <div class="aksi">
+
+                            <button
+                                class="btn-edit"
+                                onclick="editData(${index})"
+                            >
+                                ✏️ Edit
+                            </button>
+
+                            <button
+                                class="btn-hapus"
+                                onclick="hapusData(${index})"
+                            >
+                                🗑️ Hapus
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                `;
+
+
+                tabel.appendChild(baris);
+
+            }
+        );
+
+
+        document.getElementById(
+            "totalSemua"
+        ).innerText =
+            formatRupiah(totalSemua);
+
+    }
+
+
+    /* =========================
+       HAPUS SATU DATA
+       ========================= */
+
+    function hapusData(index) {
+
+        let yakin =
+            confirm(
+                "Apakah kamu yakin ingin menghapus data ini?"
+            );
+
+
+        if (yakin) {
+
+            transaksi.splice(index, 1);
+
+            tampilkanData();
+
+        }
+
+    }
+
+
+    /* =========================
+       KOSONGKAN BARANG
+       ========================= */
+
+    function kosongkanBarang() {
+
+        document.getElementById(
+            "namaBarang"
+        ).value = "";
+
+        document.getElementById(
+            "jumlah"
+        ).value = "";
+
+        document.getElementById(
+            "harga"
+        ).value = "";
+
+        document.getElementById(
+            "namaBarang"
+        ).focus();
+
+    }
+
+
+    /* =========================
+       KOSONGKAN FORM
+       ========================= */
+
+    function kosongkanForm() {
+
+        document.getElementById(
+            "namaPelanggan"
+        ).value = "";
+
+        document.getElementById(
+            "namaBarang"
+        ).value = "";
+
+        document.getElementById(
+            "jumlah"
+        ).value = "";
+
+        document.getElementById(
+            "harga"
+        ).value = "";
+
+
+        indexEdit = -1;
+
+
+        document.getElementById(
+            "btnTambah"
+        ).innerText =
+            "+ Tambah Data";
+
+    }
+
+
+    /* =========================
+       FORMAT RUPIAH
+       ========================= */
+
+    function formatRupiah(angka) {
+
+        return "Rp " +
+            angka.toLocaleString("id-ID");
+
+    }
+
+
+    /* =========================
+       FORMAT TANGGAL
+       ========================= */
+
+    function formatTanggal(tanggal) {
+
+        let bagian =
+            tanggal.split("-");
+
+
+        return bagian[2] +
+            "-" +
+            bagian[1] +
+            "-" +
+            bagian[0];
+
+    }
+
+
+    /* =========================
+       EXPORT EXCEL
+       ========================= */
+
+    function exportExcel() {
+
+        if (transaksi.length === 0) {
+
+            alert(
+                "Belum ada data untuk diekspor!"
+            );
+
+            return;
+
+        }
+
+
+        let dataExcel = [];
+
+
+        /* HEADER */
+
+        dataExcel.push([
+
+            "No",
+            "Nama Pelanggan",
+            "Tanggal",
+            "Nama Barang",
+            "Jumlah",
+            "Harga Satuan",
+            "Total"
+
+        ]);
+
+
+        /* SEMUA DATA */
+
+        transaksi.forEach(
+            function(data, index) {
+
+                dataExcel.push([
+
+                    index + 1,
+
+                    data.pelanggan,
+
+                    formatTanggal(
+                        data.tanggal
+                    ),
+
+                    data.nama,
+
+                    data.jumlah,
+
+                    data.harga,
+
+                    data.total
+
+                ]);
+
+            }
+        );
+
+
+        /* TOTAL */
+
+        let totalSemua =
+            transaksi.reduce(
+                function(total, data) {
+
+                    return total +
+                        data.total;
+
+                },
+
+                0
+            );
+
+
+        dataExcel.push([]);
+
+
+        dataExcel.push([
+
+            "",
+            "",
+            "",
+            "",
+            "",
+            "TOTAL SEMUA",
+            totalSemua
+
+        ]);
+
+
+        /* BUAT EXCEL */
+
+        let workbook =
+            XLSX.utils.book_new();
+
+
+        let worksheet =
+            XLSX.utils.aoa_to_sheet(
+                dataExcel
+            );
+
+
+        /* LEBAR KOLOM */
+
+        worksheet["!cols"] = [
+
+            { wch: 8 },
+            { wch: 25 },
+            { wch: 15 },
+            { wch: 25 },
+            { wch: 12 },
+            { wch: 18 },
+            { wch: 18 }
+
+        ];
+
+
+        XLSX.utils.book_append_sheet(
+
+            workbook,
+
+            worksheet,
+
+            "Data Kasir"
+
+        );
+
+
+        /* DOWNLOAD */
+
+        XLSX.writeFile(
+
+            workbook,
+
+            "Data_Kasir.xlsx"
+
+        );
+
+    }
+
+
+    /* =========================
+       HAPUS SEMUA
+       ========================= */
+
+    function resetData() {
+
+        if (transaksi.length === 0) {
+
+            return;
+
+        }
+
+
+        let yakin =
+            confirm(
+                "Apakah kamu yakin ingin menghapus semua data?"
+            );
+
+
+        if (yakin) {
+
+            transaksi = [];
+
+            indexEdit = -1;
+
+            tampilkanData();
+
+        }
+
+    }
+
+</script>
+
+</body>
+
+</html>
